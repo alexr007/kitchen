@@ -1,3 +1,7 @@
+/*
+ * D2 connected to PIR sensor
+ * D13 connected to relay used to control the LED
+ */
 #define PORT_LED    LED_BUILTIN
 #define PORT_SENSOR 2 // Input for HC-S501
 #define SENSOR_DELAY 4000;
