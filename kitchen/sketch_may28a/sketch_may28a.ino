@@ -1,21 +1,50 @@
-#define LED_PORT   LED_BUILTIN
-
+#define PORT_LED    LED_BUILTIN
+#define PORT_SENSOR 2 // Input for HC-S501
+#define SENSOR_DELAY 4000;
 bool state;
+int sensor;
+int outcome;
+unsigned long time;
 
-void switch_state() {
-  state = !state;
+// reads the PIR sensor value to variable sensor
+void read_sensor() {
+  sensor = digitalRead(PORT_SENSOR);
 }
 
-void switch_led() {
-  digitalWrite(LED_PORT, state ? HIGH : LOW);
+// sets LED according to variable outcome
+void set_led() {
+  digitalWrite(PORT_LED, outcome);
+}
+
+bool busy() {
+  return millis()-time<SENSOR_DELAY;
+}
+
+void set_timer() {
+  time=millis();
+}
+
+// makes decision based on sensor,timer, and state and sets the value for variable outcome 
+void decision() {
+  if (sensor==HIGH) { // we analyze only ON event
+    set_timer();
+    state = !state;
+    outcome = state ? HIGH : LOW;
+  }
 }
 
 void setup() {
-  pinMode(LED_PORT, OUTPUT);
+  pinMode(PORT_LED, OUTPUT);
+  pinMode(PORT_SENSOR, INPUT);
+  digitalWrite(PORT_LED, LOW);
+  time = millis();
+  state = false;
 }
 
 void loop() {
-  switch_led();
-  switch_state();
-  delay(1000);
+    if (!busy()) {
+        read_sensor();
+        decision();
+        set_led();
+    }
 }
